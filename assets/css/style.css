@@ -1,0 +1,7 @@
+/* stylesheet */
+* {
+  box-sizing: border-box; }
+
+body {
+  background-color: beige;
+  margin: 0% 2%; }
