@@ -81,7 +81,7 @@ $(document).ready(function() {
 //------------------------------------------------------------------------------------------
 // FUNCTIONS
 //
-  function displayAllChars() {
+  function displayStarwarChars() {
     /* traverse swObjArray */
     /* dynamically create objects */
     $.each(swObjArray, function( index, obj ) {
@@ -134,24 +134,17 @@ $(document).ready(function() {
       $(lowerCardPar).text("Health: " + obj.healthPoints);
       // append lowerCardPar to lowerCardBody
       $(lowerCardBody).append(lowerCardPar);
-
-      $.each( obj, function( key, value ) {
-        /* create each character using a bootstrap card layout */
-        console.log( key + ": " + value );
-      });
     });
   }
 
   function initializeGame() {
-    console.log("In initializeGame()");
-
-    /* empty section elements */
+    // empty section elements 
     $("#available-chars, #hero, #enemies").empty();
 
-    /* fill available characters, reset health points */
-    displayAllChars();
+    // fill available characters, reset health points
+    displayStarwarChars();
 
-    /* later, put music background, default is mute */
+    // later, put music background, default is mute 
   }
 
   /*******************************************************************************
@@ -162,40 +155,80 @@ $(document).ready(function() {
     console.log("in selectHero()");
     var heroId = "";
     var enemyId = "";
+    var isHeroSelected = false;
+    var indexSwCard = 0;
     $(".sw-card").on("click", function() {
-      // get star war's character id from card-'s value
-      heroId = $("#" + $(this).attr("id"));
       // get index of card clicked in swObjArray -- dependent on way card's 'id' is named
       // 'id' is of the form 'swchar-1-card', so number of card is always in seventh position
       indexSwCard = parseInt($(this).attr("id").slice(7,8)) - 1; 
-      console.log("indexSwCard: " + indexSwCard);
-      //console.log("this.charNum: " + this.charNum);
-      console.log("card selected: " + $(this).attr("id") + " section: " + 
-                   swObjArray[indexSwCard].currentSection);
-      swObjArray[indexSwCard].currentSection = 1; // 1 represents hero's section
-      // have hero character disappear from section, without deleting its content
-      $(heroId).detach();
-      // attach hero character selected to '#hero' div
-      $("#hero").append(heroId);
-      console.log("obj current section: " + swObjArray[1].currentSection);
+      // only if card's current section value is 0... to avoid having multiple heroes
+      if ( (swObjArray[indexSwCard].currentSection === 0) && (isHeroSelected === false) ) {
+        // get star war's character id from card-'s value
+        heroId = $("#" + $(this).attr("id"));
 
-      // the non-clicked cards will be moved to the enemies section
-      $.each(swObjArray, function( index, obj ) {
-        console.log("in each loop");
-        if (obj.currentSection !== 1) {
-          enemyId = $("#" + obj.swCharId + "-card");
-          obj.currentSection = 2; // 2 represent's enemy section
-          $(enemyId).detach();
-          $("#enemies").append(enemyId);
-        }
-        console.log("obj.charName: " + obj.charName + " obj.currentSection: " + obj.currentSection);
-      });
+        console.log("indexSwCard: " + indexSwCard);
+        console.log("card: " + $(this).attr("id") + " section: " + swObjArray[indexSwCard].currentSection);
+        swObjArray[indexSwCard].currentSection = 1; // 1 represents hero's section
+        // have hero character disappear from section, without deleting its content
+        $(heroId).detach();
+        // attach hero character selected to '#hero' div
+        $("#hero").append(heroId);
+
+
+        // the non-clicked cards will be moved to the enemies section
+        $.each(swObjArray, function( index, obj ) {
+          console.log("in each loop");
+          if (obj.currentSection !== 1) {
+            enemyId = $("#" + obj.swCharId + "-card");
+            obj.currentSection = 2; // 2 represent's enemies section section
+            $(enemyId).detach();
+            $("#enemies").append(enemyId);
+          }
+          console.log("obj.charName: " + obj.charName + " obj.currentSection: " + obj.currentSection);
+        });
+
+        isHeroSelected = true;
+        console.log("obj current section: " + swObjArray[indexSwCard].currentSection);
+      }
+
+
+
     }); 
+  }
+
+  /*****************************************************************************************
+   * selectEnemy picks enemy hero fights against
+   */
+  function selectEnemy() {
+    console.log("inSelectEnemy");
+    var isEnemySelected = false;
+    
+    $(".sw-card").on("click", function() {
+
+      console.log("in select enemy click");
+      indexSwCard = parseInt($(this).attr("id").slice(7,8)) - 1; 
+      // only if card's current section value is 0... to avoid having multiple heroes
+      if ( (swObjArray[indexSwCard].currentSection === 2) && (isEnemySelected === false)) {
+        console.log("potential enemy selected");
+        // get star war's character id from card-'s value
+        enemyId = $("#" + $(this).attr("id"));
+
+        console.log("indexSwCard: " + indexSwCard);
+        console.log("card: " + $(this).attr("id") + " section: " + swObjArray[indexSwCard].currentSection);
+        swObjArray[indexSwCard].currentSection = 3; // 1 represents the current enemy section
+        // have hero character disappear from section, without deleting its content
+        $(enemyId).detach();
+        // attach hero character selected to '#hero' div
+        $("#current-enemy").append(enemyId);
+        console.log("obj current section: " + swObjArray[indexSwCard].currentSection);
+        isEnemySelected = true;
+      }
+    });
   }
 
   initializeGame();
   selectHero();
-//  selectEnemy();
+  selectEnemy();
 
 }); // End of document.ready function
 
