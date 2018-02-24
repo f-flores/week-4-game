@@ -39,37 +39,37 @@ $(document).ready(function() {
       buttonVal: "character1",
       charName: "Character1 Name",
       healthPoints: 100,
-      imgId: "swchar-1",
+      swCharId: "swchar-1",
       imgName: "char1.png",
       currentSection: 0, 
-      toggleState: 1
+      charNum: 1
     }, 
     swChar2 = {
       buttonVal: "character2",
       charName: "Character2 Name",
       healthPoints: 100,
-      imgId: "swchar-2",
+      swCharId: "swchar-2",
       imgName: "char2.png",
       currentSection: 0, 
-      toggleState: 1
+      charNum: 2
     }, 
     swChar3 = {
       buttonVal: "character3",
       charName: "Character3 Name",
       healthPoints: 100,
-      imgId: "swchar-3",
+      swCharId: "swchar-3",
       imgName: "char3.png",
       currentSection: 0, /* default section is available*/
-      toggleState: 1
+      charNum: 3
     }, 
     swChar4 = {
       buttonVal: "character4",
       charName: "Character4 Name",
       healthPoints: 100,
-      imgId: "swchar-4",
+      swCharId: "swchar-4",
       imgName: "char4.png",
       currentSection: 0, /* default section is available*/
-      toggleState: 1
+      charNum: 4
     };
 
 /* the data structure for the characters is an array of objects */
@@ -86,6 +86,7 @@ $(document).ready(function() {
     /* dynamically create objects */
     $.each(swObjArray, function( index, obj ) {
       console.log( index + ": " + obj.charName );
+      // block elements used to build each character's 'game card'
       var divCardOuter = $("<div>");
       var divButton = $("<button>");
       var upperCardBody = $("<div>");
@@ -96,7 +97,8 @@ $(document).ready(function() {
       var lowerCardPar = $("<p>");
 
       // give divCardOuter the following classes 
-      divCardOuter.addClass("card col-sm-12 col-md-6 col-lg-2");
+      divCardOuter.attr("id", obj.swCharId + "-card");
+      divCardOuter.addClass("card col-sm-12 col-md-6 col-lg-2 sw-card");
       divCardOuter.attr("style","width: 25rem;");
       // Append each divCardOuter to the "#available-chars" div.
       $("#available-chars").append(divCardOuter);
@@ -117,7 +119,7 @@ $(document).ready(function() {
       $(upperCardBody).append(upperCardPar);
       // add classes and attributes to buttonImg
       $(buttonImg).addClass("sw-char img-fluid card-img-top ml-1 mr-1");
-      $(buttonImg).attr("id",obj.imgId);
+      $(buttonImg).attr("id",obj.swCharId+"-img");
       $(buttonImg).attr("src",imgFile);
       $(buttonImg).attr("alt",obj.charName);
       // append image to divButton
@@ -128,7 +130,7 @@ $(document).ready(function() {
       $(divButton).append(lowerCardBody);
       // lowerCardPar classes and attributes
       $(lowerCardPar).addClass("card-text sw-text");
-      $(lowerCardPar).attr("id",obj.imgId + "-health");
+      $(lowerCardPar).attr("id",obj.swCharId + "-health");
       $(lowerCardPar).text("Health: " + obj.healthPoints);
       // append lowerCardPar to lowerCardBody
       $(lowerCardBody).append(lowerCardPar);
@@ -156,24 +158,40 @@ $(document).ready(function() {
    * selectHero() on clicking a button image of a star war character
    */
   function selectHero() {
+ 
     console.log("in selectHero()");
+    var heroId = "";
+    var enemyId = "";
+    $(".sw-card").on("click", function() {
+      // get star war's character id from card-'s value
+      heroId = $("#" + $(this).attr("id"));
+      // get index of card clicked in swObjArray -- dependent on way card's 'id' is named
+      // 'id' is of the form 'swchar-1-card', so number of card is always in seventh position
+      indexSwCard = parseInt($(this).attr("id").slice(7,8)) - 1; 
+      console.log("indexSwCard: " + indexSwCard);
+      //console.log("this.charNum: " + this.charNum);
+      console.log("card selected: " + $(this).attr("id") + " section: " + 
+                   swObjArray[indexSwCard].currentSection);
+      swObjArray[indexSwCard].currentSection = 1; // 1 represents hero's section
+      // have hero character disappear from section, without deleting its content
+      $(heroId).detach();
+      // attach hero character selected to '#hero' div
+      $("#hero").append(heroId);
+      console.log("obj current section: " + swObjArray[1].currentSection);
 
-    $(".sw-char-button").on("click", function() {
-      //$(".sw-char").animate({ height: "500px" });
-      console.log("button charbutton clicked");
-      var msg = $(this).val();
-      console.log("msg: " + msg);
+      // the non-clicked cards will be moved to the enemies section
+      $.each(swObjArray, function( index, obj ) {
+        console.log("in each loop");
+        if (obj.currentSection !== 1) {
+          enemyId = $("#" + obj.swCharId + "-card");
+          obj.currentSection = 2; // 2 represent's enemy section
+          $(enemyId).detach();
+          $("#enemies").append(enemyId);
+        }
+        console.log("obj.charName: " + obj.charName + " obj.currentSection: " + obj.currentSection);
+      });
     }); 
   }
-
-/*   $(".char-button").on("click", function() {
-    //$(".sw-char").animate({ height: "500px" });
-    console.log("button charbutton 1 clicked");
-    var msg = $(this).val();
-    console.log("msg: " + msg);
-  }); */
-  // initialize game, get available star war characters
-
 
   initializeGame();
   selectHero();
