@@ -97,16 +97,11 @@ $(document).ready(function() {
 
       // give divCardOuter the following classes 
       divCardOuter.addClass("card col-sm-12 col-md-6 col-lg-2");
-      // add id and value 
-
-      // Give each "divCard" a value called buttonVale.
-      //divCardOuter.attr("value", obj.buttonVal);
-      // Then give each divCardOuter a its character name.
-      //divCardOuter.text(obj.charName);
+      divCardOuter.attr("style","width: 25rem;");
       // Append each divCardOuter to the "#available-chars" div.
       $("#available-chars").append(divCardOuter);
       // add class to button
-      divButton.addClass("char-button");
+      divButton.addClass("sw-char-button");
       // add button to divCardOuter div
       $(divCardOuter).append(divButton);
       // add classes to upperCardBody
@@ -114,7 +109,7 @@ $(document).ready(function() {
       // append upperCardBody to divButton
       $(divButton).append(upperCardBody);
       // add classes to upper card paragraph
-      $(upperCardPar).addClass("card-text");
+      $(upperCardPar).addClass("card-text sw-text");
       // add id to paragraph based on button value's id
       $(upperCardPar).attr("id",obj.buttonVal);
       $(upperCardPar).text(obj.charName);
@@ -132,46 +127,17 @@ $(document).ready(function() {
       // append lowerCardBody to divButton
       $(divButton).append(lowerCardBody);
       // lowerCardPar classes and attributes
-      $(lowerCardPar).addClass("card-text");
+      $(lowerCardPar).addClass("card-text sw-text");
       $(lowerCardPar).attr("id",obj.imgId + "-health");
       $(lowerCardPar).text("Health: " + obj.healthPoints);
       // append lowerCardPar to lowerCardBody
       $(lowerCardBody).append(lowerCardPar);
 
-
-
       $.each( obj, function( key, value ) {
         /* create each character using a bootstrap card layout */
         console.log( key + ": " + value );
-/*         var divCardOuter = $("<div>");
-        // give divCardOuter the following classes 
-        divCardOuter.addClass("card col-sm-12 col-md-12 col-lg-2");
-        // add id and value 
-
-        // Give each "divCard" a value called buttonVale.
-        divCardOuter.attr("value", value.buttonVal);
-
-        // Then give each "letterBtns" a text equal to "letters[i]".
-        divCardOuter.text(value.charName);
-
-        // Append each divCardOuter to the "#available-chars" div.
-        $("#available-chars").append(divCardOuter); */
       });
     });
-
-/*     <div class="card col-sm-12 col-md-12 col-lg-2" style="width: 25rem;" id="char1" value="character1">
-    <button class="char-button">
-    <div class="card-body">
-        <p class="card-text" id="char1-name">Character1 Name.</p>
-    </div>
-      <img class="sw-char img-fluid card-img-top ml-1 mr-1" id="char1-img" src="./assets/images/char1.png" alt="Character 1">
-    <div class="card-body">
-      <p class="card-text" id="char1-health">Health Points.</p>
-    </div>
-  </button>
-  </div> */
-
-
   }
 
   function initializeGame() {
@@ -183,14 +149,21 @@ $(document).ready(function() {
     /* fill available characters, reset health points */
     displayAllChars();
 
-    $(".char-button").on("click", function() {
+    /* later, put music background, default is mute */
+  }
+
+  /*******************************************************************************
+   * selectHero() on clicking a button image of a star war character
+   */
+  function selectHero() {
+    console.log("in selectHero()");
+
+    $(".sw-char-button").on("click", function() {
       //$(".sw-char").animate({ height: "500px" });
       console.log("button charbutton clicked");
       var msg = $(this).val();
       console.log("msg: " + msg);
-    });
-
-    /* later, put music background */
+    }); 
   }
 
 /*   $(".char-button").on("click", function() {
@@ -203,6 +176,8 @@ $(document).ready(function() {
 
 
   initializeGame();
+  selectHero();
+//  selectEnemy();
 
 }); // End of document.ready function
 
