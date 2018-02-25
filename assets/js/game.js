@@ -39,16 +39,6 @@ $(document).ready(function() {
   var attackBtn = $("#attack-button");
   var restartBtn = $("#restart-button");
 
-  // game state variables
-  var gameState = {
-    isEnemySelected: false,
-    isHeroSelected: false,
-    isGameOver: false,
-    currentHero: 0,
-    currentEnemy: 0,
-    listEnemies: []
-  }
-
   // star war character objects 
   var swChar1 = {
       buttonVal: "character1",
@@ -57,11 +47,11 @@ $(document).ready(function() {
       imgName: "char1.png",
       currentSection: 0, 
       charNum: 1,
-      healthPoints: 30,
+      healthPoints: 200,
       attackPower: 5,
       counterPower: 6,
       resetHealth: function() {
-        return this.healthPoints = 30;
+        return this.healthPoints = 200;
       }
     }, 
     swChar2 = {
@@ -109,6 +99,16 @@ $(document).ready(function() {
 
 // the data structure for the characters is an array of objects
   var swObjArray = [ swChar1, swChar2, swChar3, swChar4];
+
+// game state variables
+  var gameState = {
+    isEnemySelected: false,
+    isHeroSelected: false,
+    isGameOver: false,
+    currentHero: 0,
+    currentEnemy: 0,
+    enemiesRemaining: swObjArray.length - 1
+  }
 
 //------------------------------------------------------------------------------------------
 // FUNCTIONS
@@ -268,12 +268,13 @@ $(document).ready(function() {
         console.log("card: " + $(this).attr("id") + " section: " + swObjArray[indexSwCard].currentSection);
         swObjArray[indexSwCard].currentSection = 3; // 3 represents the defender section
         gameState.currentEnemy = indexSwCard; // save index
-        // have hero character disappear from section, without deleting its content
+        // have enemy character disappear from 'enemies' section, without deleting its content
         $(enemyId).detach();
-        // attach hero character selected to '#hero' div
+        // attach enemy character selected to '#current-defender' div
         $("#current-defender").append(enemyId);
         console.log("obj current section: " + swObjArray[indexSwCard].currentSection);
         gameState.isEnemySelected = true;
+        $("#attack-results").empty();
       }
     });
   }
@@ -283,6 +284,11 @@ $(document).ready(function() {
    *   use of health points, attack power and counter attack power
    */
   function fight() {
+    // send message if no enemy has been selected yet
+    if (!gameState.isEnemySelected && !gameState.isGameOver) {
+      $("#attack-results").html("No enemy here.");
+    } 
+
     // fight is enabled if hero and defender are present
     if (gameState.isHeroSelected && gameState.isEnemySelected && !gameState.isGameOver) {
       var sText = "";
@@ -304,16 +310,37 @@ $(document).ready(function() {
       $("#" + swObjArray[eIndex].swCharId + "-health").text("Health: " + swObjArray[eIndex].healthPoints);
 
       // update hero's attackPower
-      swObjArray[hIndex].attackPower += 1;
+      swObjArray[hIndex].attackPower += swObjArray[hIndex].attackPower;
       console.log("hero and enemy selected. fight can begin");
       $("#attack-results").html(sText);
 
-      // check for negative health, is loser
+      // check for enemy's health, hero wins if enemy's HP healthPoints are 0 or less
+      if (swObjArray[eIndex].healthPoints <= 0) {
+        console.log("You win!");
+        gameState.isEnemySelected = false;
+        gameState.enemiesRemaining--;
+        if (gameState.enemiesRemaining > 0) {
+          sText = "You have defeated " + swObjArray[eIndex].charName + ", ";
+          sText += "You can choose to fight another enemy.";
+        } else  {
+          console.log("You won the game!!!");
+          sText = "You won the game!!";
+          gameState.isGameOver = true;
+        }
+        $("#attack-results").html(sText);
+        $("#current-defender").empty();
+      }
+
+      // check for hero's health, loses if HP healthPoints is 0 or less
       if (swObjArray[hIndex].healthPoints <= 0) {
         gameState.isGameOver = true;
         console.log("You lose!");
         sText = "You have been defeated... GAME OVER!";
         $("#attack-results").html(sText);
+      }
+
+      // if game is over, show restart button
+      if (gameState.isGameOver) {
         restartButton.addClass("btn btn-secondary ml-3");
         restartButton.text("Restart");
         $("#restart-button").append(restartButton);
