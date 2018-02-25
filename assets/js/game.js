@@ -5,7 +5,8 @@
  * Date: February, 2018
  * Description: This javascript file implements the Star Wars RPG game. The user selects
  *  an attacker and a defender. The goal of the game is for the attacker to beat the enemy
- *  defender.
+ *  defender. Health points, attack power, and counterattack power and choice of enemy
+ *  determines who will win.
  * 
  ******************************************************************************************/
 
@@ -13,17 +14,9 @@
 //
 // GLOBAL VARIABLES AND OBJECTS
 //
-const MAX = 10;
-const DEBUG = false;
 const IMG_PATH = "./assets/images/";
 const START_ID = 7;
 const END_ID = 8;
-
-
-//------------------------------------------------------------------------------------------
-//
-// GLOBAL FUNCTIONS
-//
 
 
 //------------------------------------------------------------------------------------------
@@ -50,6 +43,9 @@ $(document).ready(function() {
       healthPoints: 200,
       attackPower: 5,
       counterPower: 6,
+      getAttackPower: function() {
+        return this.attackPower;
+      },
       resetHealth: function() {
         return this.healthPoints = 200;
       }
@@ -107,6 +103,7 @@ $(document).ready(function() {
     isGameOver: false,
     currentHero: 0,
     currentEnemy: 0,
+    attackIncrement: 0,
     enemiesRemaining: swObjArray.length - 1
   }
 
@@ -186,6 +183,7 @@ $(document).ready(function() {
     gameState.isHeroSelected = false;
     gameState.isEnemySelected = false;
     gameState.isGameOver = false;
+    gameState.enemiesRemaining = swObjArray.length - 1;
 
     // reset health points
     $.each(swObjArray, function( index, obj ) {
@@ -222,6 +220,7 @@ $(document).ready(function() {
         console.log("card: " + $(this).attr("id") + " section: " + swObjArray[indexSwCard].currentSection);
         swObjArray[indexSwCard].currentSection = 1; // 1 represents hero's section
         gameState.currentHero = indexSwCard; // save index of hero selected
+        gameState.attackIncrement = swObjArray[indexSwCard].attackPower;
         // have hero character disappear from section, without deleting its content
         $(heroId).detach();
         // attach hero character selected to '#hero' div
@@ -294,6 +293,7 @@ $(document).ready(function() {
       var sText = "";
       var hIndex = gameState.currentHero;
       var eIndex = gameState.currentEnemy;
+      console.log("attackIncrement: " + gameState.attackIncrement);
       var restartButton = $("<button>");
 
       // assemble fight section's text
@@ -310,7 +310,7 @@ $(document).ready(function() {
       $("#" + swObjArray[eIndex].swCharId + "-health").text("Health: " + swObjArray[eIndex].healthPoints);
 
       // update hero's attackPower
-      swObjArray[hIndex].attackPower += swObjArray[hIndex].attackPower;
+      swObjArray[hIndex].attackPower += gameState.attackIncrement;
       console.log("hero and enemy selected. fight can begin");
       $("#attack-results").html(sText);
 
@@ -322,7 +322,7 @@ $(document).ready(function() {
         if (gameState.enemiesRemaining > 0) {
           sText = "You have defeated " + swObjArray[eIndex].charName + ", ";
           sText += "You can choose to fight another enemy.";
-        } else  {
+        } else {
           console.log("You won the game!!!");
           sText = "You won the game!!";
           gameState.isGameOver = true;
@@ -355,8 +355,6 @@ $(document).ready(function() {
   selectHero();
   selectEnemy();
   attackBtn.on("click", fight);
-
-  // updateScenario();
 
 }); // End of document.ready function
 
